@@ -1,17 +1,21 @@
-name: CI
+name: CI devops 2023
 
 on:
   push:
-    branches:
-      - main
+    branches: # TODO: Add branches to trigger this job
+  pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  test-backend: 
+    runs-on: ubuntu-22.04
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
 
-    - name: Build and test
-      run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build and test with Maven
+        run: mvn clean verify
