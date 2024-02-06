@@ -232,3 +232,65 @@ docker run -d -p 8080:8080 --name api-service --net=app-network myapi-bdd
 
 ## Http server
 
+### Index.html
+
+![Alt text](image-1.png)
+
+### Reverse proxy
+
+```conf
+ServerName localhost
+
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+
+<VirtualHost *:80>
+    ProxyPreserveHost On
+
+    # Pour les requêtes vers /mon_api, redirigez vers le serveur HTTP
+    ProxyPass /mon_api/ http://tp1_backend_1:8080/
+    ProxyPassReverse /mon_api/ http://tp1_backend_1:8080/
+</VirtualHost>
+```
+
+## Docker-compose
+
+### Config
+
+```yml
+version: '3.7'
+
+services:
+    backend:
+        build:
+            context: ./Backend API/SpringApp/simpleapi BDD
+        networks:
+            - my-network
+        depends_on:
+            - database
+
+    database:
+        image: postgre
+        environment:
+            POSTGRES_DB: db
+            POSTGRES_USER: usr
+            POSTGRES_PASSWORD: pwd
+        networks:
+            - my-network
+
+    httpd:
+        build:
+            context: ./Backend API/Http/Apache
+        ports:
+            - "8081:80"
+        networks:
+            - my-network
+        depends_on:
+            - backend
+
+networks:
+    my-network:
+```
+
+# TP 2 - Github Action
+
