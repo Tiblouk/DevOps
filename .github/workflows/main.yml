@@ -1,1 +1,17 @@
-mvn clean verify --file ".\TP_1\Backend_API\SpringApp\simpleapi_BDD\pom.xml"
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build and test
+      run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
