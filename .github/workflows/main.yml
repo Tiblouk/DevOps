@@ -2,7 +2,7 @@ name: CI devops 2023
 
 on:
   push:
-    branches: # TODO: Add branches to trigger this job
+    branches: main
   pull_request:
 
 jobs:
@@ -18,4 +18,4 @@ jobs:
           java-version: '17'
 
       - name: Build and test with Maven
-        run: mvn clean verify
+        run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
