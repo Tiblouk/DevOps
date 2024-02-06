@@ -1,22 +1,29 @@
+# Définition du nom du workflow
 name: CI devops 2023
 
+# Événements déclencheurs du workflow
 on:
   push:
     branches: main
   pull_request:
 
+# Définition des jobs à exécuter dans le workflow
 jobs:
   test-backend: 
+    # Spécification de l'environnement d'exécution
     runs-on: ubuntu-22.04
     steps:
+      # Étape pour récupérer le code depuis le dépôt GitHub
       - name: Checkout code
         uses: actions/checkout@v2.5.0
 
+      # Étape pour configurer JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'adopt'
           
+      # Étape pour construire et tester avec Maven
       - name: Build and test with Maven
         run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
