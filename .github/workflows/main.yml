@@ -9,6 +9,7 @@ on:
 
 # Définition des jobs à exécuter dans le workflow
 jobs:
+  # Job pour tester le backend
   test-backend: 
     # Spécification de l'environnement d'exécution
     runs-on: ubuntu-22.04
@@ -16,7 +17,7 @@ jobs:
       # Étape pour récupérer le code depuis le dépôt GitHub
       - name: Checkout code
         uses: actions/checkout@v2.5.0
-
+  
       # Étape pour configurer JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -27,3 +28,39 @@ jobs:
       # Étape pour construire et tester avec Maven
       - name: Build and test with Maven
         run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
+        
+  # Job pour construire et publier l'image Docker
+  build-and-push-docker-image:
+    # Dépend du job 'test-backend'
+    needs: test-backend
+    # Exécuter uniquement lorsque le code est compilé et les tests réussissent
+    runs-on: ubuntu-22.04
+
+    # Étapes à effectuer dans le job
+    steps:
+      # Étape pour récupérer le code depuis le dépôt GitHub
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      # Étape pour construire et pousser l'image backend
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          # Chemin relatif vers l'emplacement où se trouve le code source avec le Dockerfile
+          context: ./TP_1/Backend_API/SpringApp/simpleapi_BDD
+          # Remarque : les étiquettes doivent être en minuscules
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
+
+       # Étape pour construire et pousser l'image de la base de données
+      - name: Build image and push database
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/POST_GRE
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-database:latest
+      
+      # Étape pour construire et pousser l'image httpd
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/Backend_API/Http/Apache
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
