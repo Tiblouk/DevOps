@@ -1,1 +1,1 @@
-mvn clean verify
+mvn clean verify --file .\TP_1\Backend_API\SpringApp\simpleapi_BDD\pom.xml
