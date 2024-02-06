@@ -1,0 +1,8 @@
+FROM httpd:2.4
+
+# Copier la page d'accueil dans le répertoire htdocs
+COPY index.html /usr/local/apache2/htdocs/
+COPY reverse-proxy.conf /usr/local/apache2/conf/extra/reverse-proxy.conf
+
+RUN echo "Include /usr/local/apache2/conf/extra/reverse-proxy.conf" \
+    >> /usr/local/apache2/conf/httpd.conf

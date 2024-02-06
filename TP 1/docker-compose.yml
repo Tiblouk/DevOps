@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+    backend:
+        build:
+            context: ./Backend API/SpringApp/simpleapi BDD
+        networks:
+            - my-network
+        depends_on:
+            - database
+
+    database:
+        image: postgre
+        environment:
+            POSTGRES_DB: db
+            POSTGRES_USER: usr
+            POSTGRES_PASSWORD: pwd
+        networks:
+            - my-network
+
+    httpd:
+        build:
+            context: ./Backend API/Http/Apache
+        ports:
+            - "8081:80"
+        networks:
+            - my-network
+        depends_on:
+            - backend
+
+networks:
+    my-network:

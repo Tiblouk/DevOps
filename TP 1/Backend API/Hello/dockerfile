@@ -1,0 +1,11 @@
+# Dockerfile
+FROM openjdk:11
+
+# Copier le fichier source Java dans le conteneur
+COPY Main.java /app/Main.java
+
+# Compiler le fichier Java
+RUN javac /app/Main.java
+
+# Commande à exécuter à la création du conteneur
+CMD ["java", "-cp", "/app", "Main"]
