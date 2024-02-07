@@ -64,12 +64,24 @@ jobs:
         with:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
-         # Construire et publier l'image Docker du front-end
-      - name: Build and push front-end image
-        uses: docker/build-push-action@v3
+
+   # Nouvelle étape pour construire le front-end
+  build-frontend:
+    runs-on: ubuntu-22.04
+    # Dépend du job 'test-backend'
+    needs: test-backend
+
+    steps:
+      - name: Checkout front-end code
+        uses: actions/checkout@v2.5.0
         with:
-          context: ./TP_3/devops-front-main
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-frontend:latest
+          repository: ${{secrets.DOCKERHUB_USERNAME}}/front-end-repo  # Remplacez 'owner/front-end-repo' par le chemin de votre dépôt front-end
+
+      - name: Install dependencies and build front-end with Yarn
+        working-directory: ./TP_3/devops-front-main
+        run: |
+          yarn install
+          yarn build
   # Nouvelle étape pour exécuter SonarQube
   sonarqube-analysis:
     # Dépend du job 'test-backend'
