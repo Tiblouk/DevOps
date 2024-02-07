@@ -5,11 +5,11 @@
   docker_container:
     name: tp1_backend_1
     image: tiblouk/tp-devops-simple-api
+    env:
+      DB_HOST: "{{ DB_HOST }}"
+      DB_PORT: "{{ DB_PORT | string }}"
+      DB_NAME: "{{ DB_NAME }}"
+      DB_USERNAME: "{{ DB_USERNAME }}"
+      DB_PASSWORD: "{{ DB_PASSWORD }}"
     networks:
       - name: my-network
-    env:
-      DB_HOST: tp1_database_1
-      DB_PORT: 5432
-      DB_NAME: db
-      DB_USERNAME: usr
-      DB_PASSWORD: pwd

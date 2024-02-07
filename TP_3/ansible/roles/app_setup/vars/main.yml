@@ -1,0 +1,7 @@
+---
+# vars file for roles/app_setup
+DB_HOST: tp1_database_1
+DB_PORT: 5432
+DB_NAME: db
+DB_USERNAME: usr
+DB_PASSWORD: pwd
