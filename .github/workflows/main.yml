@@ -66,6 +66,8 @@ jobs:
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
    # Job pour construire et publier les images Docker lorsqu'il y a un commit sur la branche principale
   build-and-publish:
+    # Dépend du job 'test-backend'
+    needs: build-and-push-docker-image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
