@@ -1,1 +1,104 @@
-mvn clean verify --file ".\TP_1\Backend_API\SpringApp\simpleapi_BDD\pom.xml"
+# Définition du nom du workflow
+name: CI devops 2023
+
+# Événements déclencheurs du workflow
+on:
+  push:
+    branches: main
+  pull_request:
+
+# Définition des jobs à exécuter dans le workflow
+jobs:
+  # Job pour tester le backend
+  test-backend: 
+    # Spécification de l'environnement d'exécution
+    runs-on: ubuntu-22.04
+    steps:
+      # Étape pour récupérer le code depuis le dépôt GitHub
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+  
+      # Étape pour configurer JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          
+      # Étape pour construire et tester avec Maven
+      - name: Build and test with Maven
+        run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
+        
+  # Job pour construire et publier l'image Docker
+  build-and-push-docker-image:
+    # Dépend du job 'test-backend'
+    needs: test-backend
+    # Exécuter uniquement lorsque le code est compilé et les tests réussissent
+    runs-on: ubuntu-22.04
+
+    # Étapes à effectuer dans le job
+    steps:
+      # Étape pour récupérer le code depuis le dépôt GitHub
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      # Étape pour construire et pousser l'image backend
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          # Chemin relatif vers l'emplacement où se trouve le code source avec le Dockerfile
+          context: ./TP_1/Backend_API/SpringApp/simpleapi_BDD
+          # Remarque : les étiquettes doivent être en minuscules
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
+
+       # Étape pour construire et pousser l'image de la base de données
+      - name: Build image and push database
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/POST_GRE
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-database:latest
+      
+      # Étape pour construire et pousser l'image httpd
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/Backend_API/Http/Apache
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
+   # Job pour construire et publier les images Docker lorsqu'il y a un commit sur la branche principale
+  build-and-publish:
+    needs: test-backend
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/Backend_API/SpringApp/simpleapi_BDD
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main
+
+      - name: Build and push postgres image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/POST_GRE
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-postgres:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  
+
+      - name: Build and push httpd image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/Backend_API/Http/Apache
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main  
