@@ -1,2 +1,15 @@
 ---
 # tasks file for roles/app_setup
+
+- name: Start Docker container for Spring Boot application
+  docker_container:
+    name: tp1_backend_1
+    image: tiblouk/tp-devops-simple-api
+    networks:
+      - name: my-network
+    env:
+      DB_HOST: tp1_database_1
+      DB_PORT: 5432
+      DB_NAME: db
+      DB_USERNAME: usr
+      DB_PASSWORD: pwd

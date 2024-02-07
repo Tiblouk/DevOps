@@ -1,2 +1,11 @@
----
 # tasks file for roles/proxy_setup
+
+# Démarrage du conteneur Apache HTTPD
+- name: Start Apache HTTPD container
+  docker_container:
+    name: tp1_httpd_1
+    image: tiblouk/tp-devops-httpd
+    ports:
+      - "80:80"
+    networks:
+      - name: my-network

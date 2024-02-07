@@ -1,2 +1,14 @@
 ---
 # tasks file for roles/database_setup
+
+# Démarrage du service PostgreSQL
+- name: Start PostgreSQL container
+  docker_container:
+    name: tp1_database_1
+    image: tiblouk/tp-devops-postgres
+    env:
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+    networks:
+      - name: my-network

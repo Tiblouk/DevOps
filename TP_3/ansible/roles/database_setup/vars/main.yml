@@ -1,2 +1,5 @@
 ---
 # vars file for roles/database_setup
+postgres_user: usr
+postgres_password: pwd
+postgres_db: db
