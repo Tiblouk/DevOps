@@ -64,28 +64,12 @@ jobs:
         with:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
-
-  # Nouvelle étape pour construire et publier l'image Docker du front-end
-  build-and-push-frontend-image:
-    # Dépend du job précédent
-    needs: build-and-push-docker-image
-    runs-on: ubuntu-22.04
-
-    steps:
-      # Récupérer le code source du front-end
-      - name: Checkout front-end code
-        uses: actions/checkout@v2.5.0
-        with:
-          repository: owner/front-end-repo
-
-      # Construire et publier l'image Docker du front-end
+         # Construire et publier l'image Docker du front-end
       - name: Build and push front-end image
         uses: docker/build-push-action@v3
         with:
           context: ./TP_3/devops-front-main
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-frontend:latest
-          push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main
-
   # Nouvelle étape pour exécuter SonarQube
   sonarqube-analysis:
     # Dépend du job 'test-backend'
