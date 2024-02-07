@@ -85,7 +85,7 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v3
         with:
-          context: ./simple-api
+          context: ./TP_1/Backend_API/SpringApp/simpleapi_BDD
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
           push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main
 
