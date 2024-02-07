@@ -1,0 +1,17 @@
+# Inventaire Ansible
+
+# Section 'all' représentant tous les hôtes
+all:
+  # Variables applicables à tous les hôtes de la section 'all'
+  vars:
+    # Utilisateur SSH à utiliser pour la connexion
+    ansible_user: centos
+    # Chemin absolu vers la clé privée SSH pour l'authentification
+    ansible_ssh_private_key_file: /home/tiblouk/Bureau/dossier/DevOps/TP_3/id_rsa
+
+  # Groupes d'hôtes pour une meilleure organisation
+  children:
+    # Groupe 'prod' contenant des hôtes de production
+    prod:
+      # Liste des hôtes de production
+      hosts: yamine.kebaili.takima.cloud

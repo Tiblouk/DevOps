@@ -1,0 +1,14 @@
+# Playbook Ansible pour installer Docker
+
+# Définition des hôtes cibles, collecte des faits désactivée, exécution en tant que super utilisateur
+- hosts: all
+  gather_facts: false
+  become: true
+  
+  ## Utilisation des rôles
+  roles:
+    - docker_setup  # Rôle pour installer Docker
+    - network_setup  # Rôle pour créer le réseau Docker
+    - database_setup  # Rôle pour lancer la base de données
+    - app_setup  # Rôle pour lancer l'application
+    - proxy_setup  # Rôle pour configurer le proxy
