@@ -1,0 +1,10 @@
+---
+# tasks file for roles/front
+- name: Start Front container
+  docker_container:
+    name: front
+    image: tiblouk/tp-devops-frontend
+    ports:
+      - "8082:80"
+    networks:
+      - name: my-network
