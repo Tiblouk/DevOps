@@ -90,7 +90,7 @@ jobs:
           
    # Job pour construire et publier les images Docker lorsqu'il y a un commit sur la branche principale
   build-and-publish:
-    needs: build-and-push-docker-image
+    needs: test-backend
     runs-on: ubuntu-22.04
 
     steps:
