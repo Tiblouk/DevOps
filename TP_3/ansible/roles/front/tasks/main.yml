@@ -3,8 +3,8 @@
 - name: Start Front container
   docker_container:
     name: front
-    image: tiblouk/tp-devops-frontend
+    image: tiblouk/tp-devops-front
     ports:
-      - "8082:80"
+      - "8082:8085"
     networks:
       - name: my-network
