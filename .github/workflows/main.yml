@@ -64,18 +64,8 @@ jobs:
         with:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
-          
-      # Étape pour construire et pousser le front-end
-      - name: Build and push front-end image
-        uses: docker/build-push-action@v3
-        with:
-          context: ./TP_3/devops-front-main
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-front:latest
-
-      
-  # Nouvelle étape pour exécuter SonarQube
-  sonarqube-analysis:
-    # Dépend du job 'test-backend'
+   # Job pour construire et publier les images Docker lorsqu'il y a un commit sur la branche principale
+  build-and-publish:
     needs: test-backend
     runs-on: ubuntu-22.04
 
@@ -83,11 +73,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2.5.0
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
-          distribution: 'adopt'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: SonarQube analysis
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Tiblouk_DevOps -Dsonar.organization=tiblouk -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/Backend_API/SpringApp/simpleapi_BDD
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main
+
+      - name: Build and push postgres image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/POST_GRE
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-postgres:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  
+
+      - name: Build and push httpd image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_1/Backend_API/Http/Apache
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main  
