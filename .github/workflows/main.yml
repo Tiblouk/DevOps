@@ -68,21 +68,20 @@ jobs:
    # Nouvelle étape pour construire le front-end
   build-frontend:
     runs-on: ubuntu-22.04
-    # Dépend du job 'test-backend'
     needs: test-backend
-
+  
     steps:
-      - name: Install dependencies and build front-end with Yarn
-        working-directory: ./TP_3/devops-front-main
-        run: |
-          yarn install
-          yarn build
-          
       - name: Checkout front-end code
         uses: actions/checkout@v2.5.0
         with:
-          context: ./TP_3/devops-front-main
-          tags:  ${{secrets.DOCKERHUB_USERNAME}}/front-end-repo:latest  # Remplacez 'owner/front-end-repo' par le chemin de votre dépôt front-end
+          repository: .  # Utilisez '.' pour spécifier le dépôt actuel
+          path: ./TP_3/devops-front-main  # Spécifiez le chemin où vous souhaitez que le code source soit récupéré
+  
+      - name: Install dependencies and build front-end with Yarn
+        working-directory: ./TP_3/devops-front-main  # Accédez au répertoire où le code source a été récupéré
+        run: |
+          yarn install
+          yarn build
 
       
   # Nouvelle étape pour exécuter SonarQube
