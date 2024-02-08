@@ -12,11 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Setup SSH for Git
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
             
       - name: Run Ansible playbook
-        run: ansible-playbook -i ./TP_3/ansible/inventories/setup.yml ./TP_3/ansible/playbook.yml
+        run: ansible-playbook -i ./TP_3/ansible/inventories/setup.yml ./TP_3/ansible/playbook.yml --private-key=./TP_3/id_rsa
