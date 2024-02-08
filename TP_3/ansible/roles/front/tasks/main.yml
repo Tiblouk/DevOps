@@ -4,7 +4,5 @@
   docker_container:
     name: front
     image: tiblouk/tp-devops-front
-    ports:
-      - "1589:80"
     networks:
       - name: my-network
