@@ -65,12 +65,12 @@ jobs:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
           
-       # Étape pour construire et pousser le front-end
-      - name: Build image and push front-end
+      # Étape pour construire et pousser le front-end
+      - name: Build and push front-end image
         uses: docker/build-push-action@v3
         with:
           context: ./TP_3/devops-front-main
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/front-end-repo:latest
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-front:latest
 
       
   # Nouvelle étape pour exécuter SonarQube
