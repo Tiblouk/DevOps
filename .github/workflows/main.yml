@@ -64,27 +64,13 @@ jobs:
         with:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
-
-   # Nouvelle étape pour construire le front-end
-  build-frontend:
-    runs-on: ubuntu-22.04
-    needs: test-backend
-    
-    steps:
-      - name: Checkout front-end code
-        uses: actions/checkout@v2.5.0
-    
-      - name: Install dependencies and build front-end with Yarn
-        run: |
-          yarn install
-          yarn build ./TP_3/devops-front-main
-  
+          
+       # Étape pour construire et pousser le front-end
       - name: Build image and push front-end
         uses: docker/build-push-action@v3
         with:
           context: ./TP_3/devops-front-main
           tags: ${{secrets.DOCKERHUB_USERNAME}}/front-end-repo:latest
-       
 
       
   # Nouvelle étape pour exécuter SonarQube
