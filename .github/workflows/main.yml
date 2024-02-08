@@ -75,7 +75,7 @@ jobs:
       - name: Checkout front-end code
         uses: actions/checkout@v2.5.0
         with:
-          repository: ${{secrets.DOCKERHUB_USERNAME}}/front-end-repo:latest  # Remplacez 'owner/front-end-repo' par le chemin de votre dépôt front-end
+          repository:  ./TP_3/devops-front-main  # Remplacez 'owner/front-end-repo' par le chemin de votre dépôt front-end
 
       - name: Install dependencies and build front-end with Yarn
         working-directory: ./TP_3/devops-front-main
