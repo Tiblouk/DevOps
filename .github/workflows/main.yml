@@ -64,6 +64,14 @@ jobs:
         with:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
+          # Étape pour construire et pousser l'image httpd
+      # Étape pour construire et pousser le front-end
+      - name: Build and push front-end image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_3/devops-front-main
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-front:latest
+          
    # Job pour construire et publier les images Docker lorsqu'il y a un commit sur la branche principale
   build-and-publish:
     needs: test-backend
@@ -101,4 +109,11 @@ jobs:
         with:
           context: ./TP_1/Backend_API/Http/Apache
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main  
+          
+      - name: Build and push front-end image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./TP_3/devops-front-main
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-front:latest
           push: ${{ github.ref == 'refs/heads/main' }}  # Pousse l'image seulement si le commit est sur la branche main  
