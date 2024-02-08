@@ -19,4 +19,4 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           
       - name: Run Ansible playbook
-        run: ansible-playbook -i ./TP_3/ansible/inventories/setup.yml ./TP_3/ansible/playbook.yml --private-key=./TP_3/id_rsa -u centos
+        run: ansible-playbook -u centos -i ./TP_3/ansible/inventories/setup.yml ./TP_3/ansible/playbook.yml 
