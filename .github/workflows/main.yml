@@ -73,15 +73,14 @@ jobs:
     steps:
       - name: Checkout front-end code
         uses: actions/checkout@v2.5.0
-        with:
-          repository: .  # Utilisez '.' pour spécifier le dépôt actuel
-          path: ./TP_3/devops-front-main  # Spécifiez le chemin où vous souhaitez que le code source soit récupéré
   
       - name: Install dependencies and build front-end with Yarn
-        working-directory: ./TP_3/devops-front-main  # Accédez au répertoire où le code source a été récupéré
         run: |
           yarn install
           yarn build
+        with:
+          context: ./TP_3/devops-front-main
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/front-end-repo:latest
 
       
   # Nouvelle étape pour exécuter SonarQube
