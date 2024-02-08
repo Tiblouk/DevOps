@@ -76,6 +76,7 @@ jobs:
   build-and-publish:
     needs: test-backend
     runs-on: ubuntu-22.04
+    needs: build-and-push-docker-image
 
     steps:
       - name: Checkout code
