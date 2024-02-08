@@ -28,7 +28,23 @@ jobs:
       # Étape pour construire et tester avec Maven
       - name: Build and test with Maven
         run: mvn clean verify --file "TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml"
-        
+   # Nouvelle étape pour exécuter SonarQube
+  sonarqube-analysis:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: SonarQube analysis
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Tiblouk_DevOps -Dsonar.organization=tiblouk -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./TP_1/Backend_API/SpringApp/simpleapi_BDD/pom.xml
+
   # Job pour construire et publier l'image Docker
   build-and-push-docker-image:
     # Dépend du job 'test-backend'
