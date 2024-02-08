@@ -9,15 +9,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa yamine.kebaili.takima.cloud >> ~/.ssh/known_hosts
+          
       - name: Run Ansible playbook
         run: ansible-playbook -i ./TP_3/ansible/inventories/setup.yml ./TP_3/ansible/playbook.yml
