@@ -1,32 +1,36 @@
 version: '3.7'
 
 services:
+    # Service pour le backend
     backend:
         build:
-            context: ./Backend API/SpringApp/simpleapi BDD
+            context: ./Backend API/SpringApp/simpleapi BDD # Chemin du Dockerfile pour construire l'image
         networks:
-            - my-network
+            - my-network # Network utilisé par les conteneurs pour la communication
         depends_on:
-            - database
+            - database  # Dépend du service 'database'
 
+    # Service pour la base de données
     database:
-        image: postgre
+        image: postgre # Image utilisée pour créer le conteneur
         environment:
             POSTGRES_DB: db
             POSTGRES_USER: usr
             POSTGRES_PASSWORD: pwd
         networks:
-            - my-network
-
+            - my-network # Network utilisé par les conteneurs pour la communication
+        volumes:
+            - /home/tiblouk/Bureau/dossier/DevOps/TP_1/POST_GRE/data:/var/lib/postgresql/data # Volume pour la persistance des données
+    # Service pour le serveur HTTP
     httpd:
         build:
-            context: ./Backend API/Http/Apache
+            context: ./Backend API/Http/Apache # Chemin du Dockerfile pour construire l'image
         ports:
-            - "8081:80"
+            - "8081:80" # Mappage du port du conteneur sur le port de l'hôte
         networks:
-            - my-network
+            - my-network # Network utilisé par les conteneurs pour la communication
         depends_on:
-            - backend
+            - backend  # Dépend du service 'backend'
 
 networks:
-    my-network:
+    my-network: # Network utilisé par les conteneurs pour la communication

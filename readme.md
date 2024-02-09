@@ -73,7 +73,14 @@ docker run -p "8090:8080" --net=app-network --name=adminer -d adminer
 Ajout des scripts SQL nécessaires dans le répertoire du conteneur /docker-entrypoint-initdb.d.
 
 ```dockerfile
+FROM postgres:14.1-alpine
+
 COPY init-scripts/*.sql /docker-entrypoint-initdb.d
+```
+### Persist data
+
+```bash
+docker run -d -p 5432:5432 --name postgre --network app-network -e POSTGRES_DB=db -e POSTGRES_USER=usr -e POSTGRES_PASSWORD=pwd -v /home/tiblouk/Bureau/dossier/DevOps/TP_1/POST_GRE/data:/var/lib/postgresql/data postgre 
 ```
 
 ## Backend API
@@ -261,36 +268,59 @@ LoadModule proxy_http_module modules/mod_proxy_http.so
 version: '3.7'
 
 services:
+    # Service pour le backend
     backend:
         build:
-            context: ./Backend API/SpringApp/simpleapi BDD
+            context: ./Backend API/SpringApp/simpleapi BDD # Chemin du Dockerfile pour construire l'image
         networks:
-            - my-network
+            - my-network # Network utilisé par les conteneurs pour la communication
         depends_on:
-            - database
+            - database  # Dépend du service 'database'
 
+    # Service pour la base de données
     database:
-        image: postgre
+        image: postgre # Image utilisée pour créer le conteneur
         environment:
             POSTGRES_DB: db
             POSTGRES_USER: usr
             POSTGRES_PASSWORD: pwd
         networks:
-            - my-network
-
+            - my-network # Network utilisé par les conteneurs pour la communication
+        volumes:
+            - /home/tiblouk/Bureau/dossier/DevOps/TP_1/POST_GRE/data:/var/lib/postgresql/data # Volume pour la persistance des données
+    # Service pour le serveur HTTP
     httpd:
         build:
-            context: ./Backend API/Http/Apache
+            context: ./Backend API/Http/Apache # Chemin du Dockerfile pour construire l'image
         ports:
-            - "8081:80"
+            - "8081:80" # Mappage du port du conteneur sur le port de l'hôte
         networks:
-            - my-network
+            - my-network # Network utilisé par les conteneurs pour la communication
         depends_on:
-            - backend
+            - backend  # Dépend du service 'backend'
 
 networks:
-    my-network:
+    my-network: # Network utilisé par les conteneurs pour la communication
 ```
+
+#### Questions
+1-3 Document docker-compose most important commands :
+
+docker-compose up est utilisée pour construire, (re)créer et démarrer les services définis dans le fichier docker-compose.yml.
+docker-compose down arrête et supprime les conteneurs, réseaux et volumes créés.
+docker-compose build construit les services sans démarrer les conteneurs.
+
+1-4 Document your docker-compose file :
+
+Le fichier docker-compose.yml définit les services de l'application, les réseaux et les volumes. Chaque service décrit un conteneur Docker, y compris les images, les ports exposés, les variables d'environnement, etc. Les réseaux et les volumes spécifient la configuration réseau et le stockage persistant. Les dépendances entre les services sont gérées, simplifiant le développement, le test et le déploiement.
+
+1-5 Document your publication commands and published images in dockerhub.
+
+![Alt text](image-4.png)
+
+Why do we put our images into an online repo?
+
+Nous mettons nos images dans un référentiel en ligne pour faciliter le partage, la distribution et le déploiement cohérent de nos applications.
 
 # TP 2 - Github Action
 
@@ -554,21 +584,20 @@ ansible all -m copy -a "src=/home/tiblouk/Bureau/dossier/DevOps/TP_1/Backend_API
 
 ## Inventories
 Inventory :
-```bash
-all:
-  vars:
-    ansible_user: centos
-    ansible_ssh_private_key_file: /home/tiblouk/Bureau/dossier/DevOps/TP_3/id_rsa
-  children:
-    prod:
-      hosts: yamine.kebaili.takima.cloud
+```yml
+all: # Groupe de variables et d'hôtes Ansible
+  vars: # Définition des variables communes à tous les hôtes
+    ansible_user: centos # Nom d'utilisateur Ansible pour la connexion SSH
+    ansible_ssh_private_key_file: /home/tiblouk/Bureau/dossier/DevOps/TP_3/id_rsa # Chemin vers la clé privée SSH
+  children: # Définition des groupes d'hôtes
+    prod: # Groupe d'hôtes "prod"
+      hosts: yamine.kebaili.takima.cloud # Liste des hôtes inclus dans le groupe "prod"
 ```
+
 Test de l'inventory :
+
 ```bash
-ansible all -i ansible/inventories/setup.yml -m ping
-[WARNING]: Unable to parse /home/tiblouk/Bureau/dossier/DevOps/ansible/inventories/setup.yml as an inventory source
-[WARNING]: No inventory was parsed, only implicit localhost is available
-[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+ansible all -i inventories/setup.yml -m ping
 ```
 
 ## Facts
@@ -614,26 +643,11 @@ yamine.kebaili.takima.cloud | CHANGED => {
 }
 ```
 
-Doccumentation de l'inventory :
-```yml
-# Inventaire Ansible
+#### Question
+3-1 Document your inventory and base commands
 
-# Section 'all' représentant tous les hôtes
-all:
-  # Variables applicables à tous les hôtes de la section 'all'
-  vars:
-    # Utilisateur SSH à utiliser pour la connexion
-    ansible_user: centos
-    # Chemin absolu vers la clé privée SSH pour l'authentification
-    ansible_ssh_private_key_file: /home/tiblouk/Bureau/dossier/DevOps/TP_3/id_rsa
-
-  # Groupes d'hôtes pour une meilleure organisation
-  children:
-    # Groupe 'prod' contenant des hôtes de production
-    prod:
-      # Liste des hôtes de production
-      hosts: yamine.kebaili.takima.cloud
-```
+L'inventaire Ansible, défini dans un fichier YAML, répertorie les hôtes sur lesquels les tâches Ansible seront exécutées. Il peut également inclure des groupes d'hôtes pour une gestion plus efficace et organisée.
+Les commandes de base, actions effectuées avec Ansible sur les hôtes répertoriés dans l'inventaire. Ces commandes peuvent inclure des tâches de gestion, de configuration ou de maintenance des systèmes distants.
 
 ## Playbooks
 
@@ -661,7 +675,7 @@ PLAY RECAP *********************************************************************
 yamine.kebaili.takima.cloud : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
-Test du book avec une erreur
+Test du playbook avec une erreur
 
 ```bash
 ansible-playbook -i inventories/setup.yml playbook.yml --syntax-check
@@ -829,3 +843,78 @@ Main.yml :
   tags: docker
 ```
 
+#### Question 
+3-2 Document your playbook
+
+Le but d'un playbook Ansible est de définir une série d'instructions, appelées "tâches", qui seront exécutées sur les hôtes spécifiés dans l'inventaire. Ces tâches peuvent inclure des opérations de configuration, de gestion des paquets logiciels, de déploiement d'applications, et bien plus encore. Les playbooks permettent d'automatiser et de standardiser les opérations système et d'application, offrant ainsi un moyen efficace de gérer l'infrastructure informatique de manière reproductible et cohérente. En utilisant des rôles, qui sont des collections organisées de fichiers et de tâches, les playbooks peuvent être structurés de manière modulaire, favorisant ainsi la réutilisation du code, la maintenabilité et la collaboration au sein des équipes.
+
+### Deploy your App
+
+Playbook qui utilisent tout les roles :
+
+```yml
+# Playbook Ansible pour installer Docker
+
+# Définition des hôtes cibles, collecte des faits désactivée, exécution en tant que super utilisateur
+- hosts: all
+  gather_facts: false
+  become: true
+  
+  ## Utilisation des rôles
+  roles:
+    - docker_setup  # Rôle pour installer Docker
+    - network_setup  # Rôle pour créer le réseau Docker
+    - database_setup  # Rôle pour lancer la base de données
+    - app_setup  # Rôle pour lancer l'application
+    - proxy_setup  # Rôle pour configurer le proxy
+    - front
+```
+
+#### Question
+Document your docker_container tasks configuration.
+
+Le playbook ci-dessus déploie une application en utilisant plusieurs rôles Ansible pour gérer différentes parties de l'infrastructure. Voici une explication de chaque rôle :
+
+- **docker_setup** : Ce rôle installe Docker sur les hôtes cibles.
+- **network_setup** : Ce rôle crée le réseau Docker nécessaire pour la communication entre les conteneurs.
+- **database_setup** : Ce rôle lance le conteneur de base de données requis par l'application.
+- **app_setup** : Ce rôle déploie et configure l'application elle-même.
+- **proxy_setup** : Ce rôle configure le proxy pour rediriger le trafic vers l'application.
+- **front** : Ce rôle déploie la partie front-end de l'application.
+
+En combinant ces rôles dans un playbook, l'ensemble du processus de déploiement de l'application peut être automatisé et répété de manière cohérente sur différents environnements.
+
+## Continuous Deployment
+
+En théorie, cette configuration de workflow vise à automatiser le déploiement continu de l'application sur la branche de production après que toutes les étapes de développement, de test et de construction aient été effectuées avec succès.
+
+```yml
+# Définition du nom du workflow
+name: CI CD
+
+on:
+  workflow_run:
+    workflows: ["CI devops"] # Nom du workflow à surveiller
+    types:
+      - completed
+  release:
+    types: [published]
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run Ansible playbook
+        run: ansible-playbook -i inventories/setup.yml playbook.yml
+```
