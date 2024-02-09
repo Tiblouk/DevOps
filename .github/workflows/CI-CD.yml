@@ -2,6 +2,10 @@
 name: CI CD
 
 on:
+  workflow_run:
+    workflows: ["CI devops"] # Nom du workflow à surveiller
+    types:
+      - completed
   release:
     types: [published]
     branches:
