@@ -1,5 +1,5 @@
 # Définition du nom du workflow
-name: CI devops 2023
+name: CI devops
 
 # Événements déclencheurs du workflow
 on:
